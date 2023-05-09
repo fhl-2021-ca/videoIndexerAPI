@@ -76,14 +76,12 @@ namespace VideoIndexerArm
 
             for(int i = 0; i < negativeSentiments.Count; i++)
             {
-                List<Instance> sentimentInstances = negativeSentiments[i].Instances;
+                List<Instance> instances = negativeSentiments[i].Instances;
                 WorkingSet workingSet = new WorkingSet();
-                workingSet.sentiments = negativeSentiments[i];
-                List<AudioEffect> newEmotions = new List<AudioEffect>();
 
-                for (int instanceIdx = 0; instanceIdx < sentimentInstances.Count; instanceIdx++)
+                for(int instanceIdx = 0; instanceIdx < instances.Count; instanceIdx++)
                 {
-                    Instance instance = sentimentInstances[instanceIdx];
+                    Instance instance = instances[instanceIdx];
                     for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
                     {
                         AudioEffect audioEffect = emotions[emotionIdx];
@@ -94,16 +92,11 @@ namespace VideoIndexerArm
                         newAudioEffect.Id = audioEffect.Id;
                         newAudioEffect.Type = audioEffect.Type;
                         newAudioEffect.Instances = emotionInstances;
-
-                        newEmotions.Add(newAudioEffect);
                     }
                 }
-
-                workingSet.emotions = newEmotions;
             }
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
-            // Combine it with actual transcript
 
 
             return results;

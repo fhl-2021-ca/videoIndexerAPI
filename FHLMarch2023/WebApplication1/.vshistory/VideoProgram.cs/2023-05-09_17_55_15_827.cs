@@ -79,7 +79,7 @@ namespace VideoIndexerArm
                 List<Instance> sentimentInstances = negativeSentiments[i].Instances;
                 WorkingSet workingSet = new WorkingSet();
                 workingSet.sentiments = negativeSentiments[i];
-                List<AudioEffect> newEmotions = new List<AudioEffect>();
+                List<Instance> newEmotionInstances = new List<Instance>();
 
                 for (int instanceIdx = 0; instanceIdx < sentimentInstances.Count; instanceIdx++)
                 {
@@ -95,11 +95,11 @@ namespace VideoIndexerArm
                         newAudioEffect.Type = audioEffect.Type;
                         newAudioEffect.Instances = emotionInstances;
 
-                        newEmotions.Add(newAudioEffect);
+                        newEmotionInstances.Add(newAudioEffect);
                     }
                 }
 
-                workingSet.emotions = newEmotions;
+                workingSet.emotions = newEmotionInstances;
             }
 
             // Now we have -ve sentiment and corresponding emotions in same time interval

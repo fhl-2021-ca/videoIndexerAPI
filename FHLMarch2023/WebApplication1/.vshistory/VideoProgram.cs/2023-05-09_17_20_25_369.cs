@@ -67,43 +67,9 @@ namespace VideoIndexerArm
             IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
             Video video = response.Videos[0];
             List <Keyword> transcript = video.Insights.Transcript;
-            List <Sentiment> sentiments = video.Insights.Sentiments;
+            List <Sentiment> sentiment = video.Insights.Sentiments;
             List <AudioEffect> emotions = video.Insights.Emotions;
-            List<WorkingSet> workingSets = new List<WorkingSet>();
-
-
-            List<Sentiment> negativeSentiments = sentiments.FindAll(x => x.SentimentType.Equals("Negative"));
-
-            for(int i = 0; i < negativeSentiments.Count; i++)
-            {
-                List<Instance> sentimentInstances = negativeSentiments[i].Instances;
-                WorkingSet workingSet = new WorkingSet();
-                workingSet.sentiments = negativeSentiments[i];
-                List<AudioEffect> newEmotions = new List<AudioEffect>();
-
-                for (int instanceIdx = 0; instanceIdx < sentimentInstances.Count; instanceIdx++)
-                {
-                    Instance instance = sentimentInstances[instanceIdx];
-                    for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
-                    {
-                        AudioEffect audioEffect = emotions[emotionIdx];
-                        List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(instance.Start) >= 0
-                        && x.End.CompareTo(instance.End) <= 0);
-
-                        AudioEffect newAudioEffect = new AudioEffect();
-                        newAudioEffect.Id = audioEffect.Id;
-                        newAudioEffect.Type = audioEffect.Type;
-                        newAudioEffect.Instances = emotionInstances;
-
-                        newEmotions.Add(newAudioEffect);
-                    }
-                }
-
-                workingSet.emotions = newEmotions;
-            }
-
-            // Now we have -ve sentiment and corresponding emotions in same time interval
-            // Combine it with actual transcript
+            List<Instance> negativeInstances = sentiment.Find(x => x.SentimentType.Equals("Negative")).Instances;
 
 
             return results;

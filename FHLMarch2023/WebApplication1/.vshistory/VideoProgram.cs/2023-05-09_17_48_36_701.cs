@@ -72,38 +72,31 @@ namespace VideoIndexerArm
             List<WorkingSet> workingSets = new List<WorkingSet>();
 
 
-            List<Sentiment> negativeSentiments = sentiments.FindAll(x => x.SentimentType.Equals("Negative"));
+            List<Sentiment> negativeSentiments = sentiments.Find(x => x.SentimentType.Equals("Negative"));
 
             for(int i = 0; i < negativeSentiments.Count; i++)
             {
-                List<Instance> sentimentInstances = negativeSentiments[i].Instances;
+                Instance instance = negativeSentiments[i];
+                Sentiment newSentiment = new Sentiment();
+                newSentiment.SentimentType = instance.SentimentType;
+                newSentiment.AverageScore = instance.AverageScore;
+                newSentiment.Instances = instances;
                 WorkingSet workingSet = new WorkingSet();
-                workingSet.sentiments = negativeSentiments[i];
-                List<AudioEffect> newEmotions = new List<AudioEffect>();
+                workingSet.sentiment = ins
 
-                for (int instanceIdx = 0; instanceIdx < sentimentInstances.Count; instanceIdx++)
+                for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
                 {
-                    Instance instance = sentimentInstances[instanceIdx];
-                    for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
-                    {
-                        AudioEffect audioEffect = emotions[emotionIdx];
-                        List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(instance.Start) >= 0
-                        && x.End.CompareTo(instance.End) <= 0);
+                    AudioEffect audioEffect = emotions[emotionIdx];
+                    List<Instance> instances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(instance.Start) >=0 
+                    && x.End.CompareTo(instance.End) <= 0);
 
-                        AudioEffect newAudioEffect = new AudioEffect();
-                        newAudioEffect.Id = audioEffect.Id;
-                        newAudioEffect.Type = audioEffect.Type;
-                        newAudioEffect.Instances = emotionInstances;
-
-                        newEmotions.Add(newAudioEffect);
-                    }
+                    AudioEffect newAudioEffect = new AudioEffect();
+                    newAudioEffect.Id = audioEffect.Id;
+                    newAudioEffect.Type = audioEffect.Type;
+                    newAudioEffect.Instances = instances;
                 }
 
-                workingSet.emotions = newEmotions;
             }
-
-            // Now we have -ve sentiment and corresponding emotions in same time interval
-            // Combine it with actual transcript
 
 
             return results;

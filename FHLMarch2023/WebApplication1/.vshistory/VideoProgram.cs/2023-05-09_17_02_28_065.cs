@@ -1,5 +1,3 @@
-using Azure.Core;
-using Azure.Identity;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -8,6 +6,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Web;
+using Azure.Core;
+using Azure.Identity;
 using WebApplication1;
 
 namespace VideoIndexerArm
@@ -64,48 +64,7 @@ namespace VideoIndexerArm
             //await GetPlayerWidgetUrl(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
 
 
-            IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
-            Video video = response.Videos[0];
-            List <Keyword> transcript = video.Insights.Transcript;
-            List <Sentiment> sentiments = video.Insights.Sentiments;
-            List <AudioEffect> emotions = video.Insights.Emotions;
-            List<WorkingSet> workingSets = new List<WorkingSet>();
-
-
-            List<Sentiment> negativeSentiments = sentiments.FindAll(x => x.SentimentType.Equals("Negative"));
-
-            for(int i = 0; i < negativeSentiments.Count; i++)
-            {
-                List<Instance> sentimentInstances = negativeSentiments[i].Instances;
-                WorkingSet workingSet = new WorkingSet();
-                workingSet.sentiments = negativeSentiments[i];
-                List<AudioEffect> newEmotions = new List<AudioEffect>();
-
-                for (int instanceIdx = 0; instanceIdx < sentimentInstances.Count; instanceIdx++)
-                {
-                    Instance instance = sentimentInstances[instanceIdx];
-                    for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
-                    {
-                        AudioEffect audioEffect = emotions[emotionIdx];
-                        List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(instance.Start) >= 0
-                        && x.End.CompareTo(instance.End) <= 0);
-
-                        AudioEffect newAudioEffect = new AudioEffect();
-                        newAudioEffect.Id = audioEffect.Id;
-                        newAudioEffect.Type = audioEffect.Type;
-                        newAudioEffect.Instances = emotionInstances;
-
-                        newEmotions.Add(newAudioEffect);
-                    }
-                }
-
-                workingSet.emotions = newEmotions;
-            }
-
-            // Now we have -ve sentiment and corresponding emotions in same time interval
-            // Combine it with actual transcript
-
-
+            Root response = JsonSerializer.Deserialize<Root>(results)
             return results;
 /*            Console.WriteLine("\nPress Enter to exit...");
             String line = Console.ReadLine();
@@ -155,7 +114,7 @@ namespace VideoIndexerArm
                 var uploadResult = await uploadRequestResult.Content.ReadAsStringAsync();
 
                 // Get the video ID from the upload result
-                var videoId = JsonSerializer.Deserialize<VideoRequest>(uploadResult).Id;
+                var videoId = JsonSerializer.Deserialize<Video>(uploadResult).Id;
                 Console.WriteLine($"\nVideo ID {videoId} was uploaded successfully");
                 return videoId;
             }
@@ -193,7 +152,7 @@ namespace VideoIndexerArm
 
                 VerifyStatus(videoGetIndexRequestResult, System.Net.HttpStatusCode.OK);
                 var videoGetIndexResult = await videoGetIndexRequestResult.Content.ReadAsStringAsync();
-                string processingState = JsonSerializer.Deserialize<VideoRequest>(videoGetIndexResult).State;
+                string processingState = JsonSerializer.Deserialize<Video>(videoGetIndexResult).State;
 
                 // If job is finished
                 if (processingState == ProcessingState.Processed.ToString())
@@ -483,7 +442,7 @@ namespace VideoIndexerArm
             public string Location { get; set; }
         }
 
-        public class VideoRequest
+        public class Video
         {
             [JsonPropertyName("id")]
             public string Id { get; set; }

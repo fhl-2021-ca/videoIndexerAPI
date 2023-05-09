@@ -1,5 +1,3 @@
-using Azure.Core;
-using Azure.Identity;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -8,7 +6,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Web;
-using WebApplication1;
+using Azure.Core;
+using Azure.Identity;
+
 
 namespace VideoIndexerArm
 {
@@ -49,61 +49,19 @@ namespace VideoIndexerArm
             var videoId = await UploadVideo(accountId, accountLocation, accountAccessToken, ApiUrl, client, VideoUrl);
 
             // Wait for the video index to finish
-            String results = await WaitForIndex(accountId, accountLocation, accountAccessToken, ApiUrl, client, videoId);
+            await WaitForIndex(accountId, accountLocation, accountAccessToken, ApiUrl, client, videoId);
 
             // Get video level access token for Azure Video Indexer 
             var videoAccessToken = await videoIndexerResourceProviderClient.GetAccessToken(ArmAccessTokenPermission.Contributor, ArmAccessTokenScope.Video, videoId);
 
             // Search for the video
-             await GetVideoAsync(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
+            String results = await GetVideoAsync(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
 
             // Get insights widget url
             //await GetInsightsWidgetUrl(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
 
             // Get player widget url
             //await GetPlayerWidgetUrl(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
-
-
-            IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
-            Video video = response.Videos[0];
-            List <Keyword> transcript = video.Insights.Transcript;
-            List <Sentiment> sentiments = video.Insights.Sentiments;
-            List <AudioEffect> emotions = video.Insights.Emotions;
-            List<WorkingSet> workingSets = new List<WorkingSet>();
-
-
-            List<Sentiment> negativeSentiments = sentiments.FindAll(x => x.SentimentType.Equals("Negative"));
-
-            for(int i = 0; i < negativeSentiments.Count; i++)
-            {
-                List<Instance> sentimentInstances = negativeSentiments[i].Instances;
-                WorkingSet workingSet = new WorkingSet();
-                workingSet.sentiments = negativeSentiments[i];
-                List<AudioEffect> newEmotions = new List<AudioEffect>();
-
-                for (int instanceIdx = 0; instanceIdx < sentimentInstances.Count; instanceIdx++)
-                {
-                    Instance instance = sentimentInstances[instanceIdx];
-                    for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
-                    {
-                        AudioEffect audioEffect = emotions[emotionIdx];
-                        List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(instance.Start) >= 0
-                        && x.End.CompareTo(instance.End) <= 0);
-
-                        AudioEffect newAudioEffect = new AudioEffect();
-                        newAudioEffect.Id = audioEffect.Id;
-                        newAudioEffect.Type = audioEffect.Type;
-                        newAudioEffect.Instances = emotionInstances;
-
-                        newEmotions.Add(newAudioEffect);
-                    }
-                }
-
-                workingSet.emotions = newEmotions;
-            }
-
-            // Now we have -ve sentiment and corresponding emotions in same time interval
-            // Combine it with actual transcript
 
 
             return results;
@@ -155,7 +113,7 @@ namespace VideoIndexerArm
                 var uploadResult = await uploadRequestResult.Content.ReadAsStringAsync();
 
                 // Get the video ID from the upload result
-                var videoId = JsonSerializer.Deserialize<VideoRequest>(uploadResult).Id;
+                var videoId = JsonSerializer.Deserialize<Video>(uploadResult).Id;
                 Console.WriteLine($"\nVideo ID {videoId} was uploaded successfully");
                 return videoId;
             }
@@ -176,7 +134,7 @@ namespace VideoIndexerArm
         /// <param name="client"> The http client </param>
         /// <param name="videoId"> The video id </param>
         /// <returns> Prints video index when the index is complete, otherwise throws exception </returns>
-        private static async Task<String> WaitForIndex(string accountId, string accountLocation, string acountAccessToken, string apiUrl, HttpClient client, string videoId)
+        private static async Task WaitForIndex(string accountId, string accountLocation, string acountAccessToken, string apiUrl, HttpClient client, string videoId)
         {
             Console.WriteLine($"\nWaiting for video {videoId} to finish indexing.");
             string queryParams;
@@ -193,13 +151,13 @@ namespace VideoIndexerArm
 
                 VerifyStatus(videoGetIndexRequestResult, System.Net.HttpStatusCode.OK);
                 var videoGetIndexResult = await videoGetIndexRequestResult.Content.ReadAsStringAsync();
-                string processingState = JsonSerializer.Deserialize<VideoRequest>(videoGetIndexResult).State;
+                string processingState = JsonSerializer.Deserialize<Video>(videoGetIndexResult).State;
 
                 // If job is finished
                 if (processingState == ProcessingState.Processed.ToString())
                 {
                     Console.WriteLine($"The video index has completed. Here is the full JSON of the index for video ID {videoId}: \n{videoGetIndexResult}");
-                    return videoGetIndexResult;
+                    return;
                 }
                 else if (processingState == ProcessingState.Failed.ToString())
                 {
@@ -483,7 +441,7 @@ namespace VideoIndexerArm
             public string Location { get; set; }
         }
 
-        public class VideoRequest
+        public class Video
         {
             [JsonPropertyName("id")]
             public string Id { get; set; }
