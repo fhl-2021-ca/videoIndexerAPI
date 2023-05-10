@@ -125,8 +125,7 @@ namespace VideoIndexerArm
             }
 
             // add to TranscriptEmotion and somehow find next coversation from other person
-            // find transcript delta by other person
-            // P1 -> 3, what did P2 respond?
+            // 
             for (int i = 0; i < workingSets.Count; i++)
             {
                 WorkingSet workingSet = workingSets[i];

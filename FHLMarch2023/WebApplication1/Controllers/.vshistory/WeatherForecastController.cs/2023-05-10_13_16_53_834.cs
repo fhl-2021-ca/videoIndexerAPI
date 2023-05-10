@@ -25,10 +25,18 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
+        [Route("/getSsu")]
         public async Task<string> GetAsync(String videoUrl)
         {
             String result = await VideoProgram.indexvideoAndGetInsights(videoUrl);
             return result;
-        }
+
+/*            return new WeatherForecast
+            {
+                Date = DateTime.Now.AddDays(0),
+                TemperatureC = rng.Next(-20, 55),
+                Summary = Summaries[rng.Next(Summaries.Length)]
+            };
+*/        }
     }
 }

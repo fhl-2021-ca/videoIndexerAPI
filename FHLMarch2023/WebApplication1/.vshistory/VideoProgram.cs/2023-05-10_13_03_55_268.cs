@@ -124,14 +124,13 @@ namespace VideoIndexerArm
                 workingSets.Add(workingSet);
             }
 
-            // add to TranscriptEmotion and somehow find next coversation from other person
-            // find transcript delta by other person
-            // P1 -> 3, what did P2 respond?
+            // add to transcriptEmotion and somehow find next coversation from other person
             for (int i = 0; i < workingSets.Count; i++)
             {
                 WorkingSet workingSet = workingSets[i];
                 //....
             }
+
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
             // Combine it with actual transcript
@@ -141,11 +140,18 @@ namespace VideoIndexerArm
             chat.AppendUserInput("Is this an animal? Dog");
             // and get the response
             string gptResponse = await chat.GetResponseFromChatbotAsync();
-            Console.WriteLine(gptResponse); // "Yes"
+            Console.WriteLine(response); // "Yes"
 
 
-            return gptResponse;
-        }
+
+            return results;
+/*            Console.WriteLine("\nPress Enter to exit...");
+            String line = Console.ReadLine();
+            if (line == "enter")
+            {
+                System.Environment.Exit(0);
+            }
+*/        }
 
         /// <summary>
         /// Uploads a video and starts the video index. Calls the uploadVideo API (https://api-portal.videoindexer.ai/api-details#api=Operations&operation=Upload-Video)
