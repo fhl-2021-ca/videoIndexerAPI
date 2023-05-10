@@ -80,7 +80,6 @@ namespace VideoIndexerArm
                 Instance sentimentInstance = negativeSentiment.Instances[i];
                 WorkingSet workingSet = new WorkingSet();
                 workingSet.sentiment = sentimentInstance;
-
                 List<AudioEffect> newEmotions = new List<AudioEffect>();
 
                 // for each -ve sentiment, find emotions
@@ -120,6 +119,7 @@ namespace VideoIndexerArm
                 workingSet.transcript = newTranscripts;
 
                 workingSets.Add(workingSet);
+
             }
 
             // Now we have -ve sentiment and corresponding emotions in same time interval

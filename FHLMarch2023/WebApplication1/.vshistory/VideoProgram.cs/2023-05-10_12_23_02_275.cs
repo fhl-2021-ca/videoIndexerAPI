@@ -66,7 +66,7 @@ namespace VideoIndexerArm
 
             IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
             Video video = response.Videos[0];
-            List <Keyword> transcripts = video.Insights.Transcript;
+            List <Keyword> transcript = video.Insights.Transcript;
             List <Sentiment> sentiments = video.Insights.Sentiments;
             List <AudioEffect> emotions = video.Insights.Emotions;
             
@@ -80,7 +80,6 @@ namespace VideoIndexerArm
                 Instance sentimentInstance = negativeSentiment.Instances[i];
                 WorkingSet workingSet = new WorkingSet();
                 workingSet.sentiment = sentimentInstance;
-
                 List<AudioEffect> newEmotions = new List<AudioEffect>();
 
                 // for each -ve sentiment, find emotions
@@ -99,27 +98,21 @@ namespace VideoIndexerArm
                 }
                 
                 workingSet.emotions = newEmotions;
+                workingSets.Add(workingSet);
 
-                List<Keyword> newTranscripts = new List<Keyword>();
                 // for each -ve sentiment, attach the transcript
-                for (int transcriptidx = 0; transcriptidx < transcripts.Count; transcriptidx++)
+                for (int transcriptidx = 0; transcriptidx < transcript.Count; transcriptidx++)
                 {
-                    Keyword transcript = transcripts[transcriptidx];
-                    List<Instance> transcriptInstances = transcript.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
+                    List<Instance> transcriptList = transcript[transcriptidx].Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
                     && x.End.CompareTo(sentimentInstance.End) <= 0);
 
                     Keyword newTranscript = new Keyword();
                     newTranscript.Id = transcript.Id;
-                    newTranscript.Text = transcript.Text;
-                    newTranscript.SpeakerId = transcript.SpeakerId;
-                    newTranscript.Instances = transcriptInstances;
+                    newTranscript.Type = transcript.Type;
+                    newTranscript.Instances = transcriptList;
 
-                    newTranscripts.Add(newTranscript);
+                    newEmotions.Add(newTranscript);
                 }
-
-                workingSet.transcript = newTranscripts;
-
-                workingSets.Add(workingSet);
             }
 
             // Now we have -ve sentiment and corresponding emotions in same time interval

@@ -66,7 +66,7 @@ namespace VideoIndexerArm
 
             IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
             Video video = response.Videos[0];
-            List <Keyword> transcripts = video.Insights.Transcript;
+            List <Keyword> transcript = video.Insights.Transcript;
             List <Sentiment> sentiments = video.Insights.Sentiments;
             List <AudioEffect> emotions = video.Insights.Emotions;
             
@@ -80,7 +80,6 @@ namespace VideoIndexerArm
                 Instance sentimentInstance = negativeSentiment.Instances[i];
                 WorkingSet workingSet = new WorkingSet();
                 workingSet.sentiment = sentimentInstance;
-
                 List<AudioEffect> newEmotions = new List<AudioEffect>();
 
                 // for each -ve sentiment, find emotions
@@ -99,27 +98,21 @@ namespace VideoIndexerArm
                 }
                 
                 workingSet.emotions = newEmotions;
-
-                List<Keyword> newTranscripts = new List<Keyword>();
-                // for each -ve sentiment, attach the transcript
-                for (int transcriptidx = 0; transcriptidx < transcripts.Count; transcriptidx++)
-                {
-                    Keyword transcript = transcripts[transcriptidx];
-                    List<Instance> transcriptInstances = transcript.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
-                    && x.End.CompareTo(sentimentInstance.End) <= 0);
-
-                    Keyword newTranscript = new Keyword();
-                    newTranscript.Id = transcript.Id;
-                    newTranscript.Text = transcript.Text;
-                    newTranscript.SpeakerId = transcript.SpeakerId;
-                    newTranscript.Instances = transcriptInstances;
-
-                    newTranscripts.Add(newTranscript);
-                }
-
-                workingSet.transcript = newTranscripts;
-
                 workingSets.Add(workingSet);
+
+                // for each -ve sentiment, attach the transcript
+                for (int transcriptidx = 0; transcriptidx < transcript.Count; transcriptidx++)
+                {
+                    List<Instance> transcriptList = transcript.FindAll(x => x.Instances.Start.CompareTo(sentimentInstance.Start) >= 0
+                    && xInstances.End.CompareTo(sentimentInstance.End) <= 0);
+
+                    AudioEffect newAudioEffect = new AudioEffect();
+                    newAudioEffect.Id = transcript.Id;
+                    newAudioEffect.Type = transcript.Type;
+                    newAudioEffect.Instances = transcriptList;
+
+                    newEmotions.Add(newAudioEffect);
+                }
             }
 
             // Now we have -ve sentiment and corresponding emotions in same time interval

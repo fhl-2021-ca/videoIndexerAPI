@@ -66,65 +66,44 @@ namespace VideoIndexerArm
 
             IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
             Video video = response.Videos[0];
-            List <Keyword> transcripts = video.Insights.Transcript;
+            List <Keyword> transcript = video.Insights.Transcript;
             List <Sentiment> sentiments = video.Insights.Sentiments;
             List <AudioEffect> emotions = video.Insights.Emotions;
-            
-            // List of -ve sentiment to list of emotions
             List<WorkingSet> workingSets = new List<WorkingSet>();
 
-            Sentiment negativeSentiment = sentiments.Find(x => x.SentimentType.Equals("Negative"));
 
-            for(int i = 0; i < negativeSentiment.Instances.Count; i++)
+            List<Sentiment> negativeSentiments = sentiments.Find(x => x.SentimentType.Equals("Negative"));
+
+            for(int i = 0; i < negativeSentiments.Count; i++)
             {
-                Instance sentimentInstance = negativeSentiment.Instances[i];
+                List<Instance> sentimentInstances = negativeSentiments[i].Instances;
                 WorkingSet workingSet = new WorkingSet();
-                workingSet.sentiment = sentimentInstance;
-
+                workingSet.sentiments = negativeSentiments[i];
                 List<AudioEffect> newEmotions = new List<AudioEffect>();
 
-                // for each -ve sentiment, find emotions
-                for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
+                for (int instanceIdx = 0; instanceIdx < sentimentInstances.Count; instanceIdx++)
                 {
-                    AudioEffect audioEffect = emotions[emotionIdx];
-                    List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
-                    && x.End.CompareTo(sentimentInstance.End) <= 0);
+                    Instance instance = sentimentInstances[instanceIdx];
+                    for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
+                    {
+                        AudioEffect audioEffect = emotions[emotionIdx];
+                        List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(instance.Start) >= 0
+                        && x.End.CompareTo(instance.End) <= 0);
 
-                    AudioEffect newAudioEffect = new AudioEffect();
-                    newAudioEffect.Id = audioEffect.Id;
-                    newAudioEffect.Type = audioEffect.Type;
-                    newAudioEffect.Instances = emotionInstances;
+                        AudioEffect newAudioEffect = new AudioEffect();
+                        newAudioEffect.Id = audioEffect.Id;
+                        newAudioEffect.Type = audioEffect.Type;
+                        newAudioEffect.Instances = emotionInstances;
 
-                    newEmotions.Add(newAudioEffect);
+                        newEmotions.Add(newAudioEffect);
+                    }
                 }
-                
+
                 workingSet.emotions = newEmotions;
-
-                List<Keyword> newTranscripts = new List<Keyword>();
-                // for each -ve sentiment, attach the transcript
-                for (int transcriptidx = 0; transcriptidx < transcripts.Count; transcriptidx++)
-                {
-                    Keyword transcript = transcripts[transcriptidx];
-                    List<Instance> transcriptInstances = transcript.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
-                    && x.End.CompareTo(sentimentInstance.End) <= 0);
-
-                    Keyword newTranscript = new Keyword();
-                    newTranscript.Id = transcript.Id;
-                    newTranscript.Text = transcript.Text;
-                    newTranscript.SpeakerId = transcript.SpeakerId;
-                    newTranscript.Instances = transcriptInstances;
-
-                    newTranscripts.Add(newTranscript);
-                }
-
-                workingSet.transcript = newTranscripts;
-
-                workingSets.Add(workingSet);
             }
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
             // Combine it with actual transcript
-
 
 
             return results;
