@@ -68,7 +68,7 @@ namespace VideoIndexerArm
 
             IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
             Video video = response.Videos[0];
-            List <Transcript> transcripts = video.Insights.Transcript;
+            List <Keyword> transcripts = video.Insights.Transcript;
             List <Sentiment> sentiments = video.Insights.Sentiments;
             List <Emotion> emotions = video.Insights.Emotions;
             
@@ -102,15 +102,15 @@ namespace VideoIndexerArm
                 
                 workingSet.emotions = newEmotions;
 
-                List<Transcript> newTranscripts = new List<Transcript>();
+                List<Keyword> newTranscripts = new List<Keyword>();
                 // for each -ve sentiment, attach the transcript
                 for (int transcriptidx = 0; transcriptidx < transcripts.Count; transcriptidx++)
                 {
-                    Transcript transcript = transcripts[transcriptidx];
+                    Keyword transcript = transcripts[transcriptidx];
                     List<Instance> transcriptInstances = transcript.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
                     && x.End.CompareTo(sentimentInstance.End) <= 0);
 
-                    Transcript newTranscript = new Transcript();
+                    Keyword newTranscript = new Keyword();
                     newTranscript.Id = transcript.Id;
                     newTranscript.Text = transcript.Text;
                     newTranscript.SpeakerId = transcript.SpeakerId;
@@ -123,14 +123,6 @@ namespace VideoIndexerArm
 
                 workingSets.Add(workingSet);
             }
-
-            // add to transcriptEmotion and somehow find next coversation from other person
-            for (int i = 0; i < workingSets.Count; i++)
-            {
-                WorkingSet workingSet = workingSets[i];
-                //....
-            }
-
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
             // Combine it with actual transcript

@@ -232,6 +232,9 @@ namespace WebApplication1
 
         [JsonProperty("instances")]
         public virtual List<Instance> Instances { get; set; }
+
+        [JsonProperty("type")]
+        public virtual string Type { get; set; }
     }
 
     public partial class Instance
@@ -357,8 +360,7 @@ namespace WebApplication1
         [JsonProperty("speakerId", NullValueHandling = NullValueHandling.Ignore)]
         public virtual long? SpeakerId { get; set; }
 
-        [JsonProperty("type")]
-        public virtual string Type { get; set; }
+
     }
 
     public partial class Label

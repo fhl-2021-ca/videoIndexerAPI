@@ -336,31 +336,6 @@ namespace WebApplication1
         public virtual long? SpeakerId { get; set; }
     }
 
-
-    public partial class TranscriptEmotion
-    {
-        [JsonProperty("id")]
-        public virtual long Id { get; set; }
-
-        [JsonProperty("text")]
-        public virtual string Text { get; set; }
-
-        [JsonProperty("confidence")]
-        public virtual double Confidence { get; set; }
-
-        [JsonProperty("language")]
-        public virtual Language Language { get; set; }
-
-        [JsonProperty("instances")]
-        public virtual List<Instance> Instances { get; set; }
-
-        [JsonProperty("speakerId", NullValueHandling = NullValueHandling.Ignore)]
-        public virtual long? SpeakerId { get; set; }
-
-        [JsonProperty("type")]
-        public virtual string Type { get; set; }
-    }
-
     public partial class Label
     {
         [JsonProperty("id")]

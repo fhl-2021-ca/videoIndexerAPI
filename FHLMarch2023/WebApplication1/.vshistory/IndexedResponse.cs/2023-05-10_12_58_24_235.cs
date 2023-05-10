@@ -177,13 +177,13 @@ namespace WebApplication1
         public virtual List<Language> Languages { get; set; }
 
         [JsonProperty("transcript")]
-        public virtual List<Transcript> Transcript { get; set; }
+        public virtual List<Keyword> Transcript { get; set; }
 
         [JsonProperty("ocr")]
         public virtual List<Ocr> Ocr { get; set; }
 
         [JsonProperty("keywords")]
-        public virtual List<Transcript> Keywords { get; set; }
+        public virtual List<Keyword> Keywords { get; set; }
 
         [JsonProperty("topics")]
         public virtual List<Topic> Topics { get; set; }
@@ -315,7 +315,7 @@ namespace WebApplication1
         public virtual List<Instance> Instances { get; set; }
     }
 
-    public partial class Transcript
+    public partial class Keyword
     {
         [JsonProperty("id")]
         public virtual long Id { get; set; }
@@ -334,31 +334,6 @@ namespace WebApplication1
 
         [JsonProperty("speakerId", NullValueHandling = NullValueHandling.Ignore)]
         public virtual long? SpeakerId { get; set; }
-    }
-
-
-    public partial class TranscriptEmotion
-    {
-        [JsonProperty("id")]
-        public virtual long Id { get; set; }
-
-        [JsonProperty("text")]
-        public virtual string Text { get; set; }
-
-        [JsonProperty("confidence")]
-        public virtual double Confidence { get; set; }
-
-        [JsonProperty("language")]
-        public virtual Language Language { get; set; }
-
-        [JsonProperty("instances")]
-        public virtual List<Instance> Instances { get; set; }
-
-        [JsonProperty("speakerId", NullValueHandling = NullValueHandling.Ignore)]
-        public virtual long? SpeakerId { get; set; }
-
-        [JsonProperty("type")]
-        public virtual string Type { get; set; }
     }
 
     public partial class Label

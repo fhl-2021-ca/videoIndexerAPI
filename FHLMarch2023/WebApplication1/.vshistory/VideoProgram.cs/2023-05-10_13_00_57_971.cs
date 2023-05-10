@@ -124,12 +124,11 @@ namespace VideoIndexerArm
                 workingSets.Add(workingSet);
             }
 
-            // add to transcriptEmotion and somehow find next coversation from other person
             for (int i = 0; i < workingSets.Count; i++)
             {
-                WorkingSet workingSet = workingSets[i];
-                //....
+
             }
+
 
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
