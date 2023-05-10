@@ -23,7 +23,7 @@ namespace VideoIndexerArm
         private const string SubscriptionId = "1efcfc5c-8fc0-44da-a91a-99b94841290b";
         private const string ResourceGroup = "aseemgoyalFHL";
         private const string AccountName = "videoindexeraseem1";
-        private static OpenAIAPI api = new OpenAIAPI(new APIAuthentication("YOUR_API_KEY", "org-yourOrgHere"));
+        OpenAIAPI api = new OpenAIAPI(new APIAuthentication("YOUR_API_KEY", "org-yourOrgHere"));
 
         public static async Task<String> indexvideoAndGetInsights(string VideoUrl)
         {
@@ -131,7 +131,7 @@ namespace VideoIndexerArm
             // now let's ask it a question'
             chat.AppendUserInput("Is this an animal? Dog");
             // and get the response
-            string gptResponse = await chat.GetResponseFromChatbotAsync();
+            string response = await chat.GetResponseFromChatbotAsync();
             Console.WriteLine(response); // "Yes"
 
 
