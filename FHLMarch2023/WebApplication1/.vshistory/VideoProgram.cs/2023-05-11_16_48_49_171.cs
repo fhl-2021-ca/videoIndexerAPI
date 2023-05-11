@@ -96,8 +96,8 @@ namespace VideoIndexerArm
             Sentiment negativeSentiment = sentiments.Find(x => x.SentimentType.Equals("Negative"));
             Sentiment neutralSentiment = sentiments.Find(x => x.SentimentType.Equals("Neutral"));
 
-            List<WorkingSet> NegativeSet = doSentiment(negativeSentiment, transcripts, emotions, workingSets);
-            List<WorkingSet> NeutralSet = doSentiment(neutralSentiment, transcripts, emotions, workingSets);
+            doSentiment(negativeSentiment, transcripts, emotions, workingSets);
+            doSentiment(neutralSentiment, transcripts, emotions, workingSets);
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
             // Combine it with actual transcript
@@ -117,11 +117,11 @@ namespace VideoIndexerArm
         // The emotion will be linked to the first person...
         // a Map with key -> Both, if converstaion of both speakers is there,
         // else we have 2 keys --> First and Second as keys, where value is what the 1st person said and then what the 2nd person said.
-        private static List<WorkingSet> doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
+        private static void doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
         {
 
             if (negativeSentiment == null)
-                return null;
+                return;
 
             for (int i = 0; i < negativeSentiment.Instances.Count; i++)
             {
@@ -145,7 +145,8 @@ namespace VideoIndexerArm
                 for (int emotionIdx = 0; emotionIdx < emotions.Count; emotionIdx++)
                 {
                     Emotion audioEffect = emotions[emotionIdx];
-                    List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => withinTimeInterval(x, sentimentInstance));
+                    List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
+                                                                                    && x.End.CompareTo(sentimentInstance.End) <= 0);
                     if(emotionInstances.Count >=1)
                     {
                         // we only need 1 emotion
@@ -201,7 +202,7 @@ namespace VideoIndexerArm
                     for (int transcriptidx = 0; transcriptidx < otherSpeakerTranscripts.Count; transcriptidx++)
                     {
                         Transcript transcript = transcripts[transcriptidx];
-                        Instance transcriptInstances = transcript.Instances.Find(x => (TimeSpan.Parse(x.Start) - TimeSpan.Parse(sentimentInstance.End)).TotalSeconds >= 0);
+                        Instance transcriptInstances = transcript.Instances.Find(x => x.Start.CompareTo(sentimentInstance.End) >= 0);
                         // get just 1 transcript from other speaker
                         if (transcriptInstances != null)
                         {
@@ -226,17 +227,11 @@ namespace VideoIndexerArm
 
                 workingSets.Add(workingSet);
             }
-
-            return workingSets;
         }
 
         private static bool withinTimeInterval(Instance x, Instance sentimentInstance)
         {
-            TimeSpan start = TimeSpan.Parse(sentimentInstance.Start);
-            TimeSpan end = TimeSpan.Parse(sentimentInstance.End);
-
-            return (TimeSpan.Parse(x.Start) - TimeSpan.Parse(sentimentInstance.Start)).TotalSeconds >= 0 
-                && (TimeSpan.Parse(x.End) - TimeSpan.Parse(sentimentInstance.End)).TotalSeconds <= 0;
+            return x.Start.CompareTo(sentimentInstance.Start) >= 0 && x.End.CompareTo(sentimentInstance.End) <= 0;
         }
 
         /// <summary>

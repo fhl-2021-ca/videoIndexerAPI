@@ -96,8 +96,8 @@ namespace VideoIndexerArm
             Sentiment negativeSentiment = sentiments.Find(x => x.SentimentType.Equals("Negative"));
             Sentiment neutralSentiment = sentiments.Find(x => x.SentimentType.Equals("Neutral"));
 
-            List<WorkingSet> NegativeSet = doSentiment(negativeSentiment, transcripts, emotions, workingSets);
-            List<WorkingSet> NeutralSet = doSentiment(neutralSentiment, transcripts, emotions, workingSets);
+            doSentiment(negativeSentiment, transcripts, emotions, workingSets);
+            doSentiment(neutralSentiment, transcripts, emotions, workingSets);
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
             // Combine it with actual transcript
@@ -117,11 +117,11 @@ namespace VideoIndexerArm
         // The emotion will be linked to the first person...
         // a Map with key -> Both, if converstaion of both speakers is there,
         // else we have 2 keys --> First and Second as keys, where value is what the 1st person said and then what the 2nd person said.
-        private static List<WorkingSet> doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
+        private static void doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
         {
 
             if (negativeSentiment == null)
-                return null;
+                return;
 
             for (int i = 0; i < negativeSentiment.Instances.Count; i++)
             {
@@ -226,8 +226,6 @@ namespace VideoIndexerArm
 
                 workingSets.Add(workingSet);
             }
-
-            return workingSets;
         }
 
         private static bool withinTimeInterval(Instance x, Instance sentimentInstance)

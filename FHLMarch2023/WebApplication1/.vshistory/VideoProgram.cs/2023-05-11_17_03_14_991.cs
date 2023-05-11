@@ -97,7 +97,7 @@ namespace VideoIndexerArm
             Sentiment neutralSentiment = sentiments.Find(x => x.SentimentType.Equals("Neutral"));
 
             List<WorkingSet> NegativeSet = doSentiment(negativeSentiment, transcripts, emotions, workingSets);
-            List<WorkingSet> NeutralSet = doSentiment(neutralSentiment, transcripts, emotions, workingSets);
+            t<WorkingSet> NeutralSet = doSentiment(neutralSentiment, transcripts, emotions, workingSets);
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
             // Combine it with actual transcript
