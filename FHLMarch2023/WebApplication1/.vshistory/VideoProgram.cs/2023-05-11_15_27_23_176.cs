@@ -113,10 +113,6 @@ namespace VideoIndexerArm
             return gptResponse;
         }
 
-        // returns Working set for a sentiment...
-        // The emotion will be linked to the first person...
-        // a Map with key -> Both, if converstaion of both speakers is there,
-        // else we have 2 keys --> First and Second as keys, where value is what the 1st person said and then what the 2nd person said.
         private static void doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
         {
 
@@ -193,6 +189,7 @@ namespace VideoIndexerArm
                     {
                         actualSpeaker = 2;
                     }
+                    // get just 1 from other speaker
 
                     List<Transcript> otherSpeakerTranscripts = new List<Transcript>();
                     otherSpeakerTranscripts = transcripts.FindAll(x => x.SpeakerId != actualSpeaker);
@@ -200,20 +197,17 @@ namespace VideoIndexerArm
                     {
                         Transcript transcript = transcripts[transcriptidx];
                         Instance transcriptInstances = transcript.Instances.Find(x => x.Start.CompareTo(sentimentInstance.End) >= 0);
-                        // get just 1 transcript from other speaker
-                        if (transcriptInstances != null)
+                        if(transcriptInstances != null)
                         {
                             Transcript newTranscript = new Transcript();
                             newTranscript.Id = transcript.Id;
                             newTranscript.Text = transcript.Text;
                             newTranscript.SpeakerId = transcript.SpeakerId;
                             speakers.Add(transcript.SpeakerId.Value);
-                            newTranscript.Instances = new List<Instance>{transcriptInstances};
+                            newTranscript.Instances = new ArrayList<Transcript>{ transcriptInstances };
 
-                            otherSpeakerTranscripts.Add(newTranscript);
-                            workingSet.transcript.Add("Second", otherSpeakerTranscripts);
-
-                            break;
+                            otherSpeakerTranscripts.
+                            workingSet.transcript.Add("Second", );
                         }
                     }
                 }
@@ -224,6 +218,18 @@ namespace VideoIndexerArm
 
                 workingSets.Add(workingSet);
             }
+
+            // add to TranscriptEmotion and somehow find next coversation from other person
+            // find transcript delta by other person
+            // P1 -> 3, what did P2 respond?
+            for (int i = 0; i < workingSets.Count; i++)
+            {
+
+
+
+
+            }
+
         }
 
         /// <summary>

@@ -113,10 +113,6 @@ namespace VideoIndexerArm
             return gptResponse;
         }
 
-        // returns Working set for a sentiment...
-        // The emotion will be linked to the first person...
-        // a Map with key -> Both, if converstaion of both speakers is there,
-        // else we have 2 keys --> First and Second as keys, where value is what the 1st person said and then what the 2nd person said.
         private static void doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
         {
 
@@ -126,18 +122,8 @@ namespace VideoIndexerArm
             for (int i = 0; i < negativeSentiment.Instances.Count; i++)
             {
                 Instance sentimentInstance = negativeSentiment.Instances[i];
-
-                TimeSpan start = TimeSpan.Parse(sentimentInstance.Start);
-                TimeSpan end = TimeSpan.Parse(sentimentInstance.End);
-                double differenceInSeconds = (end - start).TotalSeconds;
-
-                // don't pick up too short dialogues 
-                if (differenceInSeconds <= 2)
-                    continue;
-
                 WorkingSet workingSet = new WorkingSet();
                 workingSet.sentiment = sentimentInstance;
-                workingSet.transcript = new Dictionary<String, List<Transcript>>();
 
                 List<Emotion> newEmotions = new List<Emotion>();
 
@@ -146,7 +132,7 @@ namespace VideoIndexerArm
                 {
                     Emotion audioEffect = emotions[emotionIdx];
                     List<Instance> emotionInstances = audioEffect.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
-                                                                                    && x.End.CompareTo(sentimentInstance.End) <= 0);
+                    && x.End.CompareTo(sentimentInstance.End) <= 0);
                     if(emotionInstances.Count >=1)
                     {
                         // we only need 1 emotion
@@ -165,65 +151,38 @@ namespace VideoIndexerArm
 //                workingSet.emotions = newEmotions;
 
                 List<Transcript> newTranscripts = new List<Transcript>();
-                HashSet<long> speakers = new HashSet<long>();
                 // for each -ve sentiment, attach the transcript
                 for (int transcriptidx = 0; transcriptidx < transcripts.Count; transcriptidx++)
                 {
                     Transcript transcript = transcripts[transcriptidx];
                     List<Instance> transcriptInstances = transcript.Instances.FindAll(x => x.Start.CompareTo(sentimentInstance.Start) >= 0
-                                                                                            && x.End.CompareTo(sentimentInstance.End) <= 0);
+                    && x.End.CompareTo(sentimentInstance.End) <= 0);
 
                     Transcript newTranscript = new Transcript();
                     newTranscript.Id = transcript.Id;
                     newTranscript.Text = transcript.Text;
                     newTranscript.SpeakerId = transcript.SpeakerId;
-                    speakers.Add(transcript.SpeakerId.Value);
                     newTranscript.Instances = transcriptInstances;
 
                     newTranscripts.Add(newTranscript);
                 }
 
-                // fetch next conversation of next speaker, we want a dialogue
-                if(speakers.Count <=1)
-                {
-                    workingSet.transcript.Add("First", newTranscripts);
-                    bool first = speakers.Contains(1);
-                    long actualSpeaker = 1;
-                    if(first == false)
-                    {
-                        actualSpeaker = 2;
-                    }
-
-                    List<Transcript> otherSpeakerTranscripts = new List<Transcript>();
-                    otherSpeakerTranscripts = transcripts.FindAll(x => x.SpeakerId != actualSpeaker);
-                    for (int transcriptidx = 0; transcriptidx < otherSpeakerTranscripts.Count; transcriptidx++)
-                    {
-                        Transcript transcript = transcripts[transcriptidx];
-                        Instance transcriptInstances = transcript.Instances.Find(x => x.Start.CompareTo(sentimentInstance.End) >= 0);
-                        // get just 1 transcript from other speaker
-                        if (transcriptInstances != null)
-                        {
-                            Transcript newTranscript = new Transcript();
-                            newTranscript.Id = transcript.Id;
-                            newTranscript.Text = transcript.Text;
-                            newTranscript.SpeakerId = transcript.SpeakerId;
-                            speakers.Add(transcript.SpeakerId.Value);
-                            newTranscript.Instances = new List<Instance>{transcriptInstances};
-
-                            otherSpeakerTranscripts.Add(newTranscript);
-                            workingSet.transcript.Add("Second", otherSpeakerTranscripts);
-
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    workingSet.transcript.Add("Both", newTranscripts);
-                }
+                workingSet.transcript = newTranscripts;
 
                 workingSets.Add(workingSet);
             }
+
+            // add to TranscriptEmotion and somehow find next coversation from other person
+            // find transcript delta by other person
+            // P1 -> 3, what did P2 respond?
+            for (int i = 0; i < workingSets.Count; i++)
+            {
+
+
+
+
+            }
+
         }
 
         /// <summary>

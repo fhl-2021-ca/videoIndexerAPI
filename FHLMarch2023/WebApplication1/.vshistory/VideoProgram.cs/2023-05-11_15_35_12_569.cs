@@ -113,10 +113,9 @@ namespace VideoIndexerArm
             return gptResponse;
         }
 
-        // returns Working set for a sentiment...
-        // The emotion will be linked to the first person...
+        // returns Working set for a sentiment.
         // a Map with key -> Both, if converstaion of both speakers is there,
-        // else we have 2 keys --> First and Second as keys, where value is what the 1st person said and then what the 2nd person said.
+        // else First and Second as keys, where value is what the 1st person said and then what the 2nd person said.
         private static void doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
         {
 

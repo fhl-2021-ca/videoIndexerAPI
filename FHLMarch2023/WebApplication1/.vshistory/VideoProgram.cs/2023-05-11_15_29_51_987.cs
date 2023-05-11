@@ -113,10 +113,6 @@ namespace VideoIndexerArm
             return gptResponse;
         }
 
-        // returns Working set for a sentiment...
-        // The emotion will be linked to the first person...
-        // a Map with key -> Both, if converstaion of both speakers is there,
-        // else we have 2 keys --> First and Second as keys, where value is what the 1st person said and then what the 2nd person said.
         private static void doSentiment(Sentiment negativeSentiment, List<Transcript> transcripts, List<Emotion> emotions, List<WorkingSet> workingSets)
         {
 
@@ -224,6 +220,18 @@ namespace VideoIndexerArm
 
                 workingSets.Add(workingSet);
             }
+
+            // add to TranscriptEmotion and somehow find next coversation from other person
+            // find transcript delta by other person
+            // P1 -> 3, what did P2 respond?
+            for (int i = 0; i < workingSets.Count; i++)
+            {
+
+
+
+
+            }
+
         }
 
         /// <summary>
