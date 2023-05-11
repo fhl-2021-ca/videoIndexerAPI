@@ -225,7 +225,6 @@ namespace VideoIndexerArm
 
                         }
                     }
-
                 }
                 else
                 {
@@ -233,10 +232,7 @@ namespace VideoIndexerArm
                     Console.WriteLine($"Found both speakers");
                 }
 
-                if (workingSet.transcript.ContainsKey("Both") || workingSet.transcript.ContainsKey("Second"))
-                {
-                    workingSets.Add(workingSet);
-                }
+                workingSets.Add(workingSet);
             }
 
             return workingSets;

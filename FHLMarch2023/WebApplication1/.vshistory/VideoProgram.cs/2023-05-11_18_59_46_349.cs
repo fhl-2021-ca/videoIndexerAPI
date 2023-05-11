@@ -215,7 +215,8 @@ namespace VideoIndexerArm
                             speakers.Add(transcript.SpeakerId.Value);
                             newTranscript.Instances = new List<Instance>{transcriptInstances};
 
-                            workingSet.transcript.Add("Second", new List<Transcript> { newTranscript });
+                            otherSpeakerTranscripts.Add(newTranscript);
+                            workingSet.transcript.Add("Second", otherSpeakerTranscripts);
 
                             break;
                         }
@@ -225,7 +226,6 @@ namespace VideoIndexerArm
 
                         }
                     }
-
                 }
                 else
                 {
@@ -233,10 +233,7 @@ namespace VideoIndexerArm
                     Console.WriteLine($"Found both speakers");
                 }
 
-                if (workingSet.transcript.ContainsKey("Both") || workingSet.transcript.ContainsKey("Second"))
-                {
-                    workingSets.Add(workingSet);
-                }
+                workingSets.Add(workingSet);
             }
 
             return workingSets;

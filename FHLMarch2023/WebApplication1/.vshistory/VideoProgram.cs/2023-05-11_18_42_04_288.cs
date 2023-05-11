@@ -126,7 +126,7 @@ namespace VideoIndexerArm
             for (int i = 0; i < negativeSentiment.Instances.Count; i++)
             {
                 Instance sentimentInstance = negativeSentiment.Instances[i];
-                Console.WriteLine($"Checking for sentiment : {sentimentInstance.Start} and {sentimentInstance.End} \n\n");
+
                 TimeSpan start = TimeSpan.Parse(sentimentInstance.Start);
                 TimeSpan end = TimeSpan.Parse(sentimentInstance.End);
                 double differenceInSeconds = (end - start).TotalSeconds;
@@ -181,7 +181,7 @@ namespace VideoIndexerArm
                         newTranscript.Instances = transcriptInstances;
 
                         newTranscripts.Add(newTranscript);
-                        Console.WriteLine($"Adding transcript : {transcript.Text}");
+
                     }
                 }
 
@@ -200,14 +200,11 @@ namespace VideoIndexerArm
                     otherSpeakerTranscripts = transcripts.FindAll(x => x.SpeakerId != actualSpeaker);
                     for (int transcriptidx = 0; transcriptidx < otherSpeakerTranscripts.Count; transcriptidx++)
                     {
-                        Transcript transcript = otherSpeakerTranscripts[transcriptidx];
+                        Transcript transcript = transcripts[transcriptidx];
                         Instance transcriptInstances = transcript.Instances.Find(x => (TimeSpan.Parse(x.Start) - TimeSpan.Parse(sentimentInstance.End)).TotalSeconds >= 0);
-
                         // get just 1 transcript from other speaker
                         if (transcriptInstances != null)
                         {
-                            Console.WriteLine($"Adding text for 2nd speaker : {transcript.Text}");
-
                             Transcript newTranscript = new Transcript();
                             newTranscript.Id = transcript.Id;
                             newTranscript.Text = transcript.Text;
@@ -215,28 +212,19 @@ namespace VideoIndexerArm
                             speakers.Add(transcript.SpeakerId.Value);
                             newTranscript.Instances = new List<Instance>{transcriptInstances};
 
-                            workingSet.transcript.Add("Second", new List<Transcript> { newTranscript });
+                            otherSpeakerTranscripts.Add(newTranscript);
+                            workingSet.transcript.Add("Second", otherSpeakerTranscripts);
 
                             break;
                         }
-                        else
-                        {
-                            Console.WriteLine($"Unable to find 2nd speaker, transcript: {transcript.Text}");
-
-                        }
                     }
-
                 }
                 else
                 {
                     workingSet.transcript.Add("Both", newTranscripts);
-                    Console.WriteLine($"Found both speakers");
                 }
 
-                if (workingSet.transcript.ContainsKey("Both") || workingSet.transcript.ContainsKey("Second"))
-                {
-                    workingSets.Add(workingSet);
-                }
+                workingSets.Add(workingSet);
             }
 
             return workingSets;
