@@ -63,27 +63,8 @@ namespace VideoIndexerArm
             return results;
 
         }
-        public static async Task<String> GetInsights(string videoId)
+        public static async Task<String> GetInsights(string results)
         {
-            var videoIndexerResourceProviderClient = await VideoIndexerResourceProviderClient.BuildVideoIndexerResourceProviderClient();
-
-            // Get account details
-            var account = await videoIndexerResourceProviderClient.GetAccount();
-            var accountLocation = account.Location;
-            var accountId = account.Properties.Id;
-
-            // Get account level access token for Azure Video Indexer 
-            var accountAccessToken = await videoIndexerResourceProviderClient.GetAccessToken(ArmAccessTokenPermission.Contributor, ArmAccessTokenScope.Account);
-
-            System.Net.ServicePointManager.SecurityProtocol |= System.Net.SecurityProtocolType.Tls12 | System.Net.SecurityProtocolType.Tls13;
-
-            // Create the http client
-            var handler = new HttpClientHandler
-            {
-                AllowAutoRedirect = false
-            };
-            var client = new HttpClient(handler);
-            String results = await WaitForIndex(accountId, accountLocation, accountAccessToken, ApiUrl, client, videoId);
             IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
             Video video = response.Videos[0];
             List<Transcript> transcripts = video.Insights.Transcript;

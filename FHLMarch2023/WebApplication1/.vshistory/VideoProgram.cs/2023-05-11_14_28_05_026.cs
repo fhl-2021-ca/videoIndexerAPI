@@ -65,6 +65,7 @@ namespace VideoIndexerArm
         }
         public static async Task<String> GetInsights(string videoId)
         {
+
             var videoIndexerResourceProviderClient = await VideoIndexerResourceProviderClient.BuildVideoIndexerResourceProviderClient();
 
             // Get account details
