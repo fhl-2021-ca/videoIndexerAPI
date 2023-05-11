@@ -33,10 +33,10 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet("insights/{videoUrl}")]
-        public async Task<string> GetInsights(string videoId)
+        public async Task<string> GetInsights(string videoUrl)
         {
 
-            string insights = await VideoProgram.GetInsights(videoId);
+            string insights = await VideoProgram.GetInsights(videoUrl);
             return insights;
 
         }
