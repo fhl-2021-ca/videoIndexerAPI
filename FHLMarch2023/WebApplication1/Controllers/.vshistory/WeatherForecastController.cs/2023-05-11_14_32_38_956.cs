@@ -25,7 +25,7 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        [HttpGet("indexed")]
+        [HttpGet("indexed/{videoUrl}")]
         public async Task<string> GetAsync(String videoUrl)
         {
             String result = await VideoProgram.indexvideo(videoUrl);

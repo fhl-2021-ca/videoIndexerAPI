@@ -25,14 +25,14 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        [HttpGet("indexed")]
+        [HttpGet("indexed/{videoUrl}")]
         public async Task<string> GetAsync(String videoUrl)
         {
             String result = await VideoProgram.indexvideo(videoUrl);
             return result;
         }
 
-        [HttpGet("insights")]
+        [HttpGet("insights/{videoUrl}")]
         public async Task<string> GetInsights(string videoId)
         {
 
