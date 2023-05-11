@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -25,22 +24,11 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        [HttpGet("indexed/{videoUrl}")]
+        [HttpGet]
         public async Task<string> GetAsync(String videoUrl)
         {
-            String result = await VideoProgram.indexvideo(videoUrl);
+            String result = await VideoProgram.indexvideoAndGetInsights(videoUrl);
             return result;
         }
-
-        [HttpGet("insights/{videoUrl}")]
-        public async Task<string> GetInsights(string videoUrl)
-        {
-
-            string insights = await VideoProgram.GetInsights(videoUrl);
-            return insights;
-
-        }
     }
-
 }
-

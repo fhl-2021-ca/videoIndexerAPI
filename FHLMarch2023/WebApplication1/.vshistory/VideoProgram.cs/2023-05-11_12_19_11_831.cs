@@ -1,10 +1,8 @@
 using Azure.Core;
 using Azure.Identity;
 using OpenAI_API;
-using OpenAI_API.Moderation;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -25,9 +23,9 @@ namespace VideoIndexerArm
         private const string SubscriptionId = "1efcfc5c-8fc0-44da-a91a-99b94841290b";
         private const string ResourceGroup = "aseemgoyalFHL";
         private const string AccountName = "videoindexeraseem1";
-        private static OpenAIAPI api = new OpenAIAPI(new APIAuthentication("YOUR_API_KEY", "org-yourOrgHere"));
+        private static OpenAIAPI api = new OpenAIAPI(new APIAuthentication("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", "Personal"));
 
-        public static async Task<string> indexvideo(string VideoUrl)
+        public static async Task<String> indexvideoAndGetInsights(string VideoUrl)
         {
             // Build Azure Video Indexer resource provider client that has access token throuhg ARM
             var videoIndexerResourceProviderClient = await VideoIndexerResourceProviderClient.BuildVideoIndexerResourceProviderClient();
@@ -55,21 +53,25 @@ namespace VideoIndexerArm
             // Wait for the video index to finish
             String results = await WaitForIndex(accountId, accountLocation, accountAccessToken, ApiUrl, client, videoId);
 
+            // Get video level access token for Azure Video Indexer 
             var videoAccessToken = await videoIndexerResourceProviderClient.GetAccessToken(ArmAccessTokenPermission.Contributor, ArmAccessTokenScope.Video, videoId);
 
             // Search for the video
-            await GetVideoAsync(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
+             await GetVideoAsync(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
 
-            return results;
+            // Get insights widget url
+            //await GetInsightsWidgetUrl(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
 
-        }
-        public static async Task<String> GetInsights(string results)
-        {
+            // Get player widget url
+            //await GetPlayerWidgetUrl(accountId, accountLocation, videoAccessToken, ApiUrl, client, videoId);
+
+
             IndexedResult response = JsonSerializer.Deserialize<IndexedResult>(results);
             Video video = response.Videos[0];
-            List<Transcript> transcripts = video.Insights.Transcript;
-            List<Sentiment> sentiments = video.Insights.Sentiments;
-            List<Emotion> emotions = video.Insights.Emotions;
+            List <Transcript> transcripts = video.Insights.Transcript;
+            List <Sentiment> sentiments = video.Insights.Sentiments;
+            List <Emotion> emotions = video.Insights.Emotions;
+            
             // List of -ve sentiment to list of emotions
             List<WorkingSet> workingSets = new List<WorkingSet>();
 
@@ -127,10 +129,8 @@ namespace VideoIndexerArm
             // P1 -> 3, what did P2 respond?
             for (int i = 0; i < workingSets.Count; i++)
             {
-
-
-
-
+                WorkingSet workingSet = workingSets[i];
+                //....
             }
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
@@ -170,7 +170,7 @@ namespace VideoIndexerArm
                     {"accessToken", acountAccessToken},
                     {"name", "video sample"},
                     {"description", "video_description"},
-                    {"privacy", "private"},
+                    {"privacy", "private"},     
                     {"partition", "partition"},
                     {"videoUrl", VideoUrl},
                 });
