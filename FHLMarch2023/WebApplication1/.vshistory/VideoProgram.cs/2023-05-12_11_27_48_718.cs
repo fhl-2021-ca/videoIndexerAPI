@@ -1,5 +1,3 @@
-using Azure;
-using Azure.AI.OpenAI;
 using Azure.Core;
 using Azure.Identity;
 using OpenAI_API;
@@ -103,31 +101,16 @@ namespace VideoIndexerArm
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
             // Combine it with actual transcript
-            /*
-                        var chat = api.Chat.CreateConversation();
-                        // now let's ask it a question'
-                        chat.AppendUserInput("Is this an animal? Dog");
-                        // and get the response
-                        string gptResponse = await chat.GetResponseFromChatbotAsync();
-                        Console.WriteLine(gptResponse); // "Yes"
-            */
 
-            #region Snippet:GenerateChatbotResponse
-            #region Snippet:CreateOpenAIClientTokenCredential
-            string endpoint = "https://fhlmayjas.openai.azure.com/";
-            var client2 = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential("1512d51d6f6f49159e1807913499c388"));
-            #endregion
+            var chat = api.Chat.CreateConversation();
+            // now let's ask it a question'
+            chat.AppendUserInput("Is this an animal? Dog");
+            // and get the response
+            string gptResponse = await chat.GetResponseFromChatbotAsync();
+            Console.WriteLine(gptResponse); // "Yes"
 
-            string deploymentName = "GPT35Turbo";
-            string prompt = "What is Azure OpenAI?";
-            Console.Write($"Input: {prompt}");
 
-            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, prompt);
-            string completion = completionsResponse.Value.Choices[0].Text;
-            Console.WriteLine($"Chatbot: {completion}");
-            #endregion
-
-            return completion;
+            return gptResponse;
         }
 
         // returns Working set for a sentiment... each working set will be sent to chatGPT one by one to generate insights

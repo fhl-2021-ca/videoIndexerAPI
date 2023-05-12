@@ -1,5 +1,3 @@
-using Azure;
-using Azure.AI.OpenAI;
 using Azure.Core;
 using Azure.Identity;
 using OpenAI_API;
@@ -114,20 +112,20 @@ namespace VideoIndexerArm
 
             #region Snippet:GenerateChatbotResponse
             #region Snippet:CreateOpenAIClientTokenCredential
-            string endpoint = "https://fhlmayjas.openai.azure.com/";
-            var client2 = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential("1512d51d6f6f49159e1807913499c388"));
+            string endpoint = "https://myaccount.openai.azure.com/";
+            var client = new OpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
             #endregion
 
-            string deploymentName = "GPT35Turbo";
+            string deploymentName = "text-davinci-003";
             string prompt = "What is Azure OpenAI?";
             Console.Write($"Input: {prompt}");
 
-            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, prompt);
+            Response<Completions> completionsResponse = client.GetCompletions(deploymentName, prompt);
             string completion = completionsResponse.Value.Choices[0].Text;
             Console.WriteLine($"Chatbot: {completion}");
             #endregion
 
-            return completion;
+            return gptResponse;
         }
 
         // returns Working set for a sentiment... each working set will be sent to chatGPT one by one to generate insights

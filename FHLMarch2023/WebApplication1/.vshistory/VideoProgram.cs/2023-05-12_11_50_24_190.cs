@@ -118,7 +118,7 @@ namespace VideoIndexerArm
             var client2 = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential("1512d51d6f6f49159e1807913499c388"));
             #endregion
 
-            string deploymentName = "GPT35Turbo";
+            string deploymentName = "text-davinci-003";
             string prompt = "What is Azure OpenAI?";
             Console.Write($"Input: {prompt}");
 

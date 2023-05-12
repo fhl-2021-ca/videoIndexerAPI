@@ -115,10 +115,10 @@ namespace VideoIndexerArm
             #region Snippet:GenerateChatbotResponse
             #region Snippet:CreateOpenAIClientTokenCredential
             string endpoint = "https://fhlmayjas.openai.azure.com/";
-            var client2 = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential("1512d51d6f6f49159e1807913499c388"));
+            var client2 = new OpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
             #endregion
 
-            string deploymentName = "GPT35Turbo";
+            string deploymentName = "text-davinci-003";
             string prompt = "What is Azure OpenAI?";
             Console.Write($"Input: {prompt}");
 
