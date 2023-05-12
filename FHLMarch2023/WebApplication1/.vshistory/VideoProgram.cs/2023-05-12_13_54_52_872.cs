@@ -210,7 +210,7 @@ namespace VideoIndexerArm
             completionsOptions.FrequencyPenalty = 0;
             completionsOptions.Prompts.Add(prompt);
 
-            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, completionsOptions);
+            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, prompt);
             string completion = completionsResponse.Value.Choices[0].Text;
             Console.WriteLine($"Chatbot: {completion}");
             #endregion

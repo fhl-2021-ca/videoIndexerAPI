@@ -38,6 +38,7 @@ namespace WebApplication1.Controllers
 
             List<String> insights = await VideoProgram.GetInsights(videoId);
             return insights;
+
         }
     }
 

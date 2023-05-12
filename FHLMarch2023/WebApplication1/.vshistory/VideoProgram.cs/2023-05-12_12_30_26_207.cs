@@ -65,7 +65,7 @@ namespace VideoIndexerArm
             return results;
 
         }
-        public static async Task<List<String>> GetInsights(string videoId)
+        public static async Task<String> GetInsights(string videoId)
         {
             var videoIndexerResourceProviderClient = await VideoIndexerResourceProviderClient.BuildVideoIndexerResourceProviderClient();
 
@@ -96,10 +96,10 @@ namespace VideoIndexerArm
             List<String> finalOutput = new List<String>();
 
 
-            Sentiment negativeSet = sentiments.Find(x => x.SentimentType.Equals("Negative"));
+            Sentiment negativeSentiment = sentiments.Find(x => x.SentimentType.Equals("Negative"));
             Sentiment neutralSentiment = sentiments.Find(x => x.SentimentType.Equals("Neutral"));
 
-            List<WorkingSet> NegativeSet = doSentiment(negativeSet, transcripts, emotions, workingSets);
+            List<WorkingSet> NegativeSet = doSentiment(negativeSentiment, transcripts, emotions, workingSets);
             List<WorkingSet> NeutralSet = doSentiment(neutralSentiment, transcripts, emotions, workingSets);
 
             // Now we have -ve sentiment and corresponding emotions in same time interval
@@ -113,15 +113,8 @@ namespace VideoIndexerArm
                         Console.WriteLine(gptResponse); // "Yes"
             */
 
-            GenerateOutputForSentiment(NegativeSet, finalOutput);
-            GenerateOutputForSentiment(NeutralSet, finalOutput);
 
-            return finalOutput;
-        }
-
-        private static void GenerateOutputForSentiment(List<WorkingSet> NegativeSet, List<string> finalOutput)
-        {
-            if (NegativeSet != null)
+            if(NegativeSet != null)
             {
                 for (int i = 0; i < NegativeSet.Count; i++)
                 {
@@ -132,48 +125,24 @@ namespace VideoIndexerArm
                     if (workingSet.transcript.ContainsKey("Both"))
                     {
                         workingSet.transcript.TryGetValue("Both", out transcript);
-                        conversation = createGPTInput(transcript);
+                        conversation = createGPTInput(transcript, workingSet.emotions);
 
-                        finalOutput.Add(getGPTResponse(conversation));
+                         finalOutput.Add(getGPTResponse(conversation));
                     }
                     else
                     {
                         workingSet.transcript.TryGetValue("First", out transcript);
                         workingSet.transcript.TryGetValue("Second", out transcript2);
-                        conversation = createGPTInput2(transcript, transcript2);
-                        finalOutput.Add(getGPTResponse(conversation));
                     }
                 }
+
             }
+
+            return finalOutput;
+
         }
 
-        private static string createGPTInput2(List<Transcript> transcript, List<Transcript> transcript2)
-        {
-            List<String> messages = new List<string>();
-            String finalConverstation = "";
-            
-            for (int i = 0; i < transcript.Count; i++)
-            {
-                Transcript transcript1 = transcript[i];
-                String message = transcript1.SpeakerId + ": " + transcript1.Text;
-                finalConverstation += message;
-                messages.Add(message);
-            }
-
-            for (int i = 0; i < transcript2.Count; i++)
-            {
-                Transcript transcript1 = transcript[i];
-                String message = transcript1.SpeakerId + ": " + transcript1.Text;
-                finalConverstation += message;
-                messages.Add(message);
-            }
-
-
-
-            return finalConverstation;
-        }
-
-        private static string createGPTInput(List<Transcript> transcript)
+        private static string createGPTInput(List<Transcript> transcript, Emotion emotions)
         {
             List<String> messages = new List<string>();
             String finalConverstation = "";
@@ -199,18 +168,12 @@ namespace VideoIndexerArm
 
             string deploymentName = "GPT35Turbo";
             // Could you please provide a single piece of evidence that there may be any issue with cultural insensitivity and D&I here
-            string prompt = $"Imagine yourself as diversity & inclusion coach.\n\nFollowing is the chat showing negative sentiments, microaggression by one of the speaker. Walk through this one by one and understand what emotions each speaker is going through and how it affects diversity and inclusion any why. List down the agression shown by speaker and what could have said differently to have a positive relation between the speakers and no one feels bad. Conversation is as follows : \n\n{conversation}.";
+            string prompt = $"Imagine yourself as diversity & inclusion coach. . \n\nFollowing is the chat showing negative sentiments, microaggression by one of the speaker. Walk through this one by one and understand what emotions each speaker is going through and how it affects diversity and inclusion any why. List down the agression shown by speaker and what could have said differently to have a positive relation between the speakers and no one feels bad. Conversation is as follows : \n\n{conversation}.";
                 //"Imagine yourself as D&I coach. \n\nThis is the transcript showing negative sentiments and fear by Hema.\n\nAseem: [Angry and fast] Look, I\'m too busy with important tasks to guide you through this. See, It\'s your responsibility to do your own research and figure out how to design architectures that work at this scale.You\'re a junior engineer, and you have a long way to go before you can come up with good designs. \n\nHema: oh, I \'m sorry. I will work harder to improve my skills. I will set up another meeting with updated architecture.\n\nAseem: Okay, let’s set up another meeting once you are ready with the new proposal.";
             
             Console.Write($"Input: {prompt}");
-            CompletionsOptions completionsOptions = new CompletionsOptions();
-            completionsOptions.PresencePenalty = 0;
-            completionsOptions.Temperature = (float?)0.9;
-            completionsOptions.MaxTokens = 1000;
-            completionsOptions.FrequencyPenalty = 0;
-            completionsOptions.Prompts.Add(prompt);
 
-            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, completionsOptions);
+            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, prompt);
             string completion = completionsResponse.Value.Choices[0].Text;
             Console.WriteLine($"Chatbot: {completion}");
             #endregion

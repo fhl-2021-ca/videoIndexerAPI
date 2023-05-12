@@ -204,13 +204,7 @@ namespace VideoIndexerArm
             
             Console.Write($"Input: {prompt}");
             CompletionsOptions completionsOptions = new CompletionsOptions();
-            completionsOptions.PresencePenalty = 0;
-            completionsOptions.Temperature = (float?)0.9;
-            completionsOptions.MaxTokens = 1000;
-            completionsOptions.FrequencyPenalty = 0;
-            completionsOptions.Prompts.Add(prompt);
-
-            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, completionsOptions);
+            Response<Completions> completionsResponse = client2.GetCompletions(deploymentName, prompt);
             string completion = completionsResponse.Value.Choices[0].Text;
             Console.WriteLine($"Chatbot: {completion}");
             #endregion
